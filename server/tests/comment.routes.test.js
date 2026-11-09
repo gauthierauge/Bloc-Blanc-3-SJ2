@@ -73,7 +73,7 @@ describe('comment routes', () => {
 
             const res = await send(method, path, { body: { content: 'hello' } });
 
-            assert.equal(res.status, 403);
+            assert.equal(res.status, 401);
             assert.equal(query.mock.callCount(), 0);
         });
 
