@@ -6,7 +6,7 @@ import { Save, User as UserIcon, Image as ImageIcon } from 'lucide-react';
 
 const EditProfile = () => {
     const { user, login } = useAuth();
-    const [formData, setFormData] = useState({ username: '', bio: '', password: '' });
+    const [formData, setFormData] = useState({ username: '', bio: '', email: '', password: '' });
     const [avatar, setAvatar] = useState(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -16,8 +16,8 @@ const EditProfile = () => {
         if (user) {
             const fetchProfile = async () => {
                 try {
-                    const { data } = await API.get(`/users/${user.id}`);
-                    setFormData({ username: data.username, bio: data.bio || '', password: '' });
+                    const { data } = await API.get(`/users/me`);
+                    setFormData({ username: data.username, bio: data.bio || '', email: data.email, password: '' });
                 } catch (err) {
                     console.error(err);
                 } finally {
@@ -44,7 +44,7 @@ const EditProfile = () => {
             });
 
             // Update local storage/context with potentially new username/avatar
-            const { data: updatedUser } = await API.get(`/users/${user.id}`);
+            const { data: updatedUser } = await API.get(`/users/me`);
             login(updatedUser, localStorage.getItem('token'));
 
             navigate(`/profile/${user.id}`);
@@ -71,6 +71,15 @@ const EditProfile = () => {
                         value={formData.username}
                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                         required
+                    />
+
+                    <label htmlFor="email" style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Email</label>
+                    <input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        readOnly
+                        style={{ opacity: 0.6, cursor: 'not-allowed' }}
                     />
 
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Bio</label>

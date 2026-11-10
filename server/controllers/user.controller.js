@@ -18,12 +18,22 @@ const reject = async (req, res, status, message) => {
 
 exports.getProfile = async (req, res) => {
     const [rows] = await pool.query(
-        'SELECT id, username, email, bio, avatar, created_at FROM users WHERE id = ?',
+        'SELECT id, username, bio, avatar, created_at FROM users WHERE id = ?',
         [req.params.id]
     );
     if (rows.length === 0) return res.status(404).json({ message: 'User not found' });
     res.json(rows[0]);
 };
+
+exports.getMe = async (req, res) => {
+  const [rows] = await pool.query(
+      'SELECT id, username, bio, email, avatar, created_at FROM users WHERE id = ?',
+      [req.userId]
+  );
+
+  if (0 === rows.length) return res.status(404).json({ message: 'Profile not found' });
+  res.json(rows[0])
+}
 
 exports.updateProfile = async (req, res) => {
     if (parseInt(req.params.id) !== req.userId) {

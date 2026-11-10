@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const bcrypt = require('bcryptjs');
 const { pool } = require('../config/db');
-const { updateProfile } = require('../controllers/user.controller');
+const { getProfile, updateProfile } = require('../controllers/user.controller');
 
 const VALID = { username: 'alice', bio: 'hello' };
 
@@ -76,6 +76,7 @@ describe('updateProfile', () => {
             assert.equal(query.mock.callCount(), 0);
         });
     }
+
 
     it('removes the upload when the validation fails', async () => {
         mockQueries();
@@ -154,5 +155,28 @@ describe('updateProfile', () => {
         assert.equal(query.mock.calls[1].arguments[1][2], `/uploads/${file.filename}`);
         assert.equal(fs.existsSync(file.path), true);
         fs.unlinkSync(file.path);
+    });
+});
+
+describe('getProfile', () => {
+    afterEach(() => mock.restoreAll());
+
+    it('does not select the email of the user', async () => {
+        const query = mockQueries([[{ id: 7, username: 'alice' }]]);
+        const res = { json(payload) { res.body = payload; } };
+
+        await getProfile({ params: { id: '7' } }, res);
+
+        const sql = query.mock.calls[0].arguments[0];
+        assert.ok(!sql.includes('email'));
+    });
+
+    it('returns the profile of the user', async () => {
+        mockQueries([[{ id: 7, username: 'alice' }]]);
+        const res = { json(payload) { res.body = payload; } };
+
+        await getProfile({ params: { id: '7' } }, res);
+
+        assert.deepEqual(res.body, { id: 7, username: 'alice' });
     });
 });

@@ -27,10 +27,10 @@ describe('verifyToken', () => {
         process.env.JWT_SECRET = SECRET;
     });
 
-    it('returns 403 without a token', () => {
+    it('returns 401 without a token', () => {
         const { res, next } = run();
 
-        assert.equal(res.statusCode, 403);
+        assert.equal(res.statusCode, 401);
         assert.equal(next.mock.callCount(), 0);
     });
 

@@ -4,6 +4,7 @@ const userController = require('../controllers/user.controller');
 const verifyToken = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
+router.get('/me', verifyToken, userController.getMe);
 router.get('/:id', userController.getProfile);
 router.put('/:id', verifyToken, upload.single('avatar'), userController.updateProfile);
 
