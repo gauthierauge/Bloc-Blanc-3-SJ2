@@ -4,9 +4,11 @@ const {validateArticle} = require("../utils/validation");
 
 exports.getAllArticles = async (req, res) => {
   const [rows] = await pool.query(`
-          SELECT articles.*, users.username, users.avatar
+          SELECT articles.*, users.username, users.avatar, COUNT(comments.id) AS comment_count
           FROM articles
           JOIN users ON articles.user_id = users.id
+          LEFT JOIN comments ON comments.article_id = articles.id
+          GROUP BY articles.id
           ORDER BY articles.created_at DESC
       `);
   res.json(rows);

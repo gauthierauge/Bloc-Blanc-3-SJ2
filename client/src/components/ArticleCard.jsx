@@ -1,7 +1,12 @@
 import { API_URL } from '../api/axios';
 import { Link } from 'react-router-dom';
+import { MessageCircle } from 'lucide-react';
+
+const formatCommentCount = (count) => `${count} ${count > 1 ? 'commentaires' : 'commentaire'}`;
 
 const ArticleCard = ({ article }) => {
+    const commentCount = Number(article.comment_count) || 0;
+
     return (
         <div className="glass" style={{ height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
             {article.image && (
@@ -16,6 +21,10 @@ const ArticleCard = ({ article }) => {
                 <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '20px', flex: 1 }}>
                     {article.content.substring(0, 100)}...
                 </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '15px' }}>
+                    <MessageCircle size={16} aria-hidden="true" />
+                    <span>{formatCommentCount(commentCount)}</span>
+                </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}>
                         {article.avatar && (
