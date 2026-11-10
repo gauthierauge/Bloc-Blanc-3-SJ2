@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import API, { API_URL } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
-import { Edit, User as UserIcon, Calendar, Mail } from "lucide-react";
+import { Edit, User as UserIcon, Calendar } from "lucide-react";
 
 const Profile = () => {
   const { id } = useParams();
@@ -81,9 +81,6 @@ const Profile = () => {
             marginBottom: "30px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-            <Mail size={16} /> {profile.email}
-          </div>
           <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
             <Calendar size={16} /> Inscrit le{" "}
             {new Date(profile.created_at).toLocaleDateString()}
