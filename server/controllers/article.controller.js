@@ -1,4 +1,6 @@
 const { pool } = require("../config/db");
+const fs = require('fs/promises');
+const {validateArticle} = require("../utils/validation");
 
 exports.getAllArticles = async (req, res) => {
   const [rows] = await pool.query(`
@@ -27,11 +29,9 @@ exports.getArticleById = async (req, res) => {
 };
 
 exports.createArticle = async (req, res) => {
-  const { title, content } = req.body;
-  if (!title && !content)
-    return res.status(400).json({ message: "values are missing" });
+  const { title, content, error } = validateArticle(req.body);
+  if (error) return reject(req, res, 400, error);
   const image = req.file ? `/uploads/${req.file.filename}` : null;
-
   const [result] = await pool.query(
     `INSERT INTO articles (title, content, image, user_id) VALUES (?, ?, ?, ?)`,
     [title, content, image, req.userId],
@@ -41,7 +41,8 @@ exports.createArticle = async (req, res) => {
 };
 
 exports.updateArticle = async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, error } = validateArticle(req.body);
+  if (error) return reject(req, res, 400, error);
   const [articles] = await pool.query("SELECT * FROM articles WHERE id = ?", [
     req.params.id,
   ]);
@@ -75,4 +76,9 @@ exports.deleteArticle = async (req, res) => {
 
   await pool.query("DELETE FROM articles WHERE id = ?", [req.params.id]);
   res.json({ message: "Article deleted successfully" });
+};
+
+const reject = async (req, res, status, message) => {
+    if (req.file) await fs.unlink(req.file.path).catch(() => {});
+    return res.status(status).json({ message });
 };

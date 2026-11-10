@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
 const verifyToken = require('../middleware/auth');
+const validateId = require('../middleware/validateId');
 const upload = require('../middleware/upload');
+
+router.param('id', validateId);
 
 router.get('/me', verifyToken, userController.getMe);
 router.get('/:id', userController.getProfile);
