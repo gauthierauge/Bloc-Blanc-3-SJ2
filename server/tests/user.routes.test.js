@@ -72,4 +72,25 @@ describe('user routes', () => {
         const body = await res.json();
         assert.equal(body.email, undefined);
     });
+
+    it('returns 400 without reading the database for GET /abc', async () => {
+        mockDb();
+
+        const res = await get('/abc');
+
+        assert.equal(res.status, 400);
+        assert.equal(query.mock.callCount(), 0);
+    });
+
+    it('returns 400 for PUT /abc', async () => {
+        mockDb();
+
+        const res = await fetch(`${baseUrl}/api/users/abc`, {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${tokenFor(7)}` },
+        });
+
+        assert.equal(res.status, 400);
+        assert.equal(query.mock.callCount(), 0);
+    });
 });
