@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { pool } = require('../config/db');
-const { createArticle, updateArticle } = require('../controllers/article.controller');
+const { createArticle, getAllArticles, updateArticle } = require('../controllers/article.controller');
 
 const VALID = { title: 'Mon article', content: 'Du contenu' };
 
@@ -167,5 +167,33 @@ describe('updateArticle', () => {
 
         assert.equal(res.statusCode, 200);
         assert.deepEqual(query.mock.calls[1].arguments[1], ['Nouveau titre', 'Nouveau contenu', null, '1']);
+    });
+});
+
+describe('getAllArticles', () => {
+    afterEach(() => mock.restoreAll());
+
+    it('asks the database for the comment count of each article', async () => {
+        const query = mockQueries([[]]);
+        const res = fakeRes();
+
+        await getAllArticles({}, res);
+
+        const sql = query.mock.calls[0].arguments[0];
+        assert.match(sql, /comments/);
+        assert.match(sql, /comment_count/);
+    });
+
+    it('returns the comment count sent by the database', async () => {
+        const rows = [
+            { id: 2, title: 'Avec commentaires', comment_count: 3 },
+            { id: 1, title: 'Sans commentaire', comment_count: 0 },
+        ];
+        mockQueries([rows]);
+        const res = fakeRes();
+
+        await getAllArticles({}, res);
+
+        assert.deepEqual(res.body, rows);
     });
 });
