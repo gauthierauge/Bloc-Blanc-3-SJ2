@@ -3,6 +3,9 @@ const router = express.Router();
 const articleController = require('../controllers/article.controller');
 const verifyToken = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const validateId = require('../middleware/validateId');
+
+router.param('id', validateId);
 
 router.get('/', articleController.getAllArticles);
 router.get('/:id', articleController.getArticleById);
